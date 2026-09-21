@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "Back-end do sistema de marcação de horário: serviço Node/Express com cadastro de usuários em MongoDB.",
-  "main": "start.js",
+  "main": "src/start.js",
   "scripts": {
     "start": "nodemon src/start.js"
   },
