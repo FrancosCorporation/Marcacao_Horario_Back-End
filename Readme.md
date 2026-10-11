@@ -1,71 +1,78 @@
 # Marcação de Horário — Back-end
 
-![Node.js](https://img.shields.io/badge/Node.js-18-339933?logo=node.js&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-22%2B-339933?logo=node.js&logoColor=white)
 ![Express](https://img.shields.io/badge/Express-4-000000?logo=express&logoColor=white)
 ![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose-47A248?logo=mongodb&logoColor=white)
 ![Licença](https://img.shields.io/badge/licen%C3%A7a-MIT-blue)
 ![Status](https://img.shields.io/badge/status-prot%C3%B3tipo-orange)
 
-Repositório back-end do sistema de marcação de horário: serviço Node/Express com cadastro de usuários em MongoDB, par do repositório [Marcacao_Horario](https://github.com/FrancosCorporation/Marcacao_Horario).
+Serviço Node/Express para cadastro de usuários em MongoDB. Ele faz parte do par de repositórios com [Marcacao_Horario](https://github.com/FrancosCorporation/Marcacao_Horario).
 
-## Sobre
+## Organização
 
-O projeto **Marcação de Horário** está dividido em dois repositórios que funcionam juntos:
+- **Marcacao_Horario** é a camada de entrada/cadastro.
+- **Marcacao_Horario_Back-End** (este repositório) mantém o serviço, o modelo de usuário e a verificação `GET /teste`.
+- Este repositório é a fonte canônica de `src/models/User.js` e `src/database/index.js`; as cópias no repositório de entrada devem permanecer iguais.
 
-- **[Marcacao_Horario](https://github.com/FrancosCorporation/Marcacao_Horario)**: camada de entrada do sistema.
-- **Marcacao_Horario_Back-End** (este): back-end, responsável pelo cadastro de usuários e pelo endpoint de verificação `/teste`.
+O serviço oferece cadastro, mas ainda não tem login nem autenticação de usuários.
 
-Os dois compartilham o mesmo modelo de usuário (`src/models/User.js`) e a mesma configuração de banco (`src/database/index.js`), então devem ser executados em conjunto.
+## API
 
-**Fonte canônica compartilhada:** este repositório é a referência para `src/models/User.js` e `src/database/index.js`; as cópias de `Marcacao_Horario` devem permanecer idênticas. `Marcacao_Horario` conserva o papel de entrada/cadastro, enquanto este repositório mantém o endpoint de verificação `/teste`.
+### `POST /auth/register`
 
-## Funcionalidades
+Recebe JSON com `name`, `email` e `password`. Campos adicionais são ignorados. O nome e o e-mail são normalizados; o e-mail deve ter formato válido e a senha precisa ter ao menos 8 caracteres. Senhas que excedem 72 bytes em UTF-8 são rejeitadas para evitar truncamento pelo bcrypt.
 
-- `POST /auth/register`: cria um usuário a partir do corpo da requisição (`name`, `email`, `password`) via Mongoose, respondendo `{"user": "Usuario Registrado"}` em caso de sucesso e `400` em caso de falha.
-- `GET /teste`: endpoint de verificação que responde `{"Nice": "Job"}`.
-- Modelo de usuário com `name`, `email` (único, minúsculo), `password` (`select: false`) e `createdAt`.
-- Parsing de JSON e `urlencoded` via `body-parser`.
-- Reload automático em desenvolvimento com **nodemon**.
+~~~json
+{
+  "name": "Ana Silva",
+  "email": "ana@example.com",
+  "password": "uma-senha-com-8-ou-mais"
+}
+~~~
 
-## Stack
+- `201`: usuário cadastrado.
+- `400`: dados inválidos ou cadastro não concluído.
+- `429`: mais de 5 tentativas do mesmo IP em 15 minutos.
+- `503`: serviço de cadastro indisponível.
 
-- **Node.js 18** (CommonJS)
-- **Express 4**
-- **Mongoose 7** (MongoDB)
-- **Nodemon 2** (desenvolvimento)
+A senha é armazenada com bcrypt e nunca é enviada na resposta. O corpo das requisições JSON e URL-encoded tem limite de 10 KB.
 
-## Como rodar
+### `GET /teste`
 
-Requer configuração de ambiente: a conexão com o MongoDB está fixada no código em `src/database/index.js`.
+Retorna `{"Nice":"Job"}` para indicar que o serviço está respondendo.
 
-```bash
-# 1. Instalar dependências
-npm install
+## Configuração e execução
 
-# 2. Ajustar a string de conexão do MongoDB em src/database/index.js
+Requer Node.js 22 ou superior e um MongoDB acessível. O serviço usa `MONGO_URI`; sem essa variável, tenta `mongodb://localhost:27017/marcacao`. A porta padrão é 3000.
 
-# 3. Subir o serviço (nodemon + src/start.js, porta 3000)
+~~~bash
+npm ci
+
+export MONGO_URI='mongodb://localhost:27017/marcacao'
+export PORT=3000
+
+# Produção
 npm start
-```
 
-Scripts disponíveis no `package.json`: `start`.
+# Desenvolvimento com recarga automática
+npm run dev
+~~~
 
-Observação: a conexão usa a opção `useMongoClient`, removida nas versões recentes do Mongoose — com a versão declarada (`^7.0.5`) a chamada de conexão precisa ser revista antes de subir o serviço.
+Em hospedagens atrás de proxy, a aplicação precisa receber o IP real do cliente para aplicar corretamente o limite por IP. Configure `trust proxy` somente de acordo com a topologia e os proxies confiáveis do ambiente.
 
-## Estrutura do projeto
+Ainda não há suíte de testes automatizados.
 
-```
-Marcacao_Horario_Back-End/
-├── src/
-│   ├── start.js                  # bootstrap do Express (porta 3000)
-│   ├── database/index.js         # conexão Mongoose
-│   ├── models/User.js            # schema de usuário
-│   ├── controller/
-│   │   ├── authController.js     # POST /auth/register
-│   │   └── indexController.js    # GET /teste
-│   └── verify/Verify.js
-└── package.json
-```
+## Estrutura
+
+~~~
+src/
+├── start.js
+├── database/index.js
+├── models/User.js
+└── controller/
+    ├── authController.js
+    └── indexController.js
+~~~
 
 ## Licença
 

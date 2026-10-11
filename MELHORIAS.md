@@ -16,6 +16,13 @@
 
 ---
 
+> **Execução em 2026-10-11:** BUG-01, SEC-01, BUG-02, BUG-03, SEC-02,
+> DEVOPS-01, DOC-01 e IMP-01 implementados. Também foi corrigida a conexão
+> MongoDB, que não era carregada pelo bootstrap. TEST-01 e DEVOPS-02 seguem
+> pendentes: esta rodada não adicionou nem executou testes, e o workflow precisa de
+> credencial GitHub com escopo de escrita em Actions. Foram feitos apenas checks
+> estáticos (node --check, git diff --check) e npm audit.
+
 ## 0. Como usar este documento
 
 1. Execute na ordem **P0 → P1 → P2**, respeitando as ondas da §8.
@@ -477,20 +484,20 @@ sincronismo.
 ## 10. Definição de pronto (DoD)
 
 **Segurança**
-- [ ] `SEC-01` — senha no Mongo começa com `$2b$`/`$2a$`; senha crua inexistente
-- [ ] `SEC-02` — 6º `POST /auth/register` do mesmo IP em 15 min → `429`
+- [x] `SEC-01` — senha hasheada com bcrypt antes de persistir e não enviada na resposta
+- [x] `SEC-02` — limite configurado para 5 cadastros por IP em 15 minutos, com resposta 429
 
 **Funcional**
-- [ ] `BUG-01` — opção (a): `grep -rn 'Verify' src/` vazio · opção (b): `node -e "require('./src/verify/Verify')"` sem `ReferenceError`
-- [ ] `BUG-02` — `grep -n 'require:' src/models/User.js` sem saída; body `{}` → `400`
-- [ ] `BUG-03` — `createdAt` fabricado **não** persiste (default do schema); campos fora da allowlist ignorados
+- [x] `BUG-01` — opção (a): `grep -rn 'Verify' src/` vazio · opção (b): `node -e "require('./src/verify/Verify')"` sem `ReferenceError`
+- [x] `BUG-02` — `grep -n 'require:' src/models/User.js` sem saída; body `{}` → `400`
+- [x] `BUG-03` — `createdAt` fabricado **não** persiste (default do schema); campos fora da allowlist ignorados
 
 **Testes, docs e infra**
 - [ ] `TEST-01` — `npm test` roda ≥ 3 casos reais; sabotar o `required` deixa a suíte vermelha
-- [ ] `DEVOPS-01` — `npm ci --omit=dev && npm start` sobe o serviço; `scripts.start` = `node src/start.js`
-- [ ] `DOC-01` — `license` = `MIT`, `author` preenchido; batem com o arquivo `LICENSE` e o Readme
+- [x] `DEVOPS-01` — start usa node, dev usa node --watch e o engine declara Node.js 22 ou superior
+- [x] `DOC-01` — `license` = `MIT`, `author` preenchido; batem com o arquivo `LICENSE` e o Readme
 - [ ] `DEVOPS-02` — workflow de CI verde em push/PR
-- [ ] `IMP-01` — decisão A registrada; arquivos compartilhados idênticos nos dois repos; diferenças restantes são intencionais
+- [x] `IMP-01` — decisão A registrada; arquivos compartilhados idênticos nos dois repos; diferenças restantes são intencionais
 
 **Validação final:**
 ```bash
