@@ -17,6 +17,8 @@ O projeto **Marcação de Horário** está dividido em dois repositórios que fu
 
 Os dois compartilham o mesmo modelo de usuário (`src/models/User.js`) e a mesma configuração de banco (`src/database/index.js`), então devem ser executados em conjunto.
 
+**Fonte canônica compartilhada:** este repositório é a referência para `src/models/User.js` e `src/database/index.js`; as cópias de `Marcacao_Horario` devem permanecer idênticas. `Marcacao_Horario` conserva o papel de entrada/cadastro, enquanto este repositório mantém o endpoint de verificação `/teste`.
+
 ## Funcionalidades
 
 - `POST /auth/register`: cria um usuário a partir do corpo da requisição (`name`, `email`, `password`) via Mongoose, respondendo `{"user": "Usuario Registrado"}` em caso de sucesso e `400` em caso de falha.
