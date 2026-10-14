@@ -23,6 +23,11 @@
 > credencial GitHub com escopo de escrita em Actions. Foram feitos apenas checks
 > estáticos (node --check, git diff --check) e npm audit.
 
+> **Execução em 2026-10-14:** DEVOPS-02 desbloqueado e implementado — token GitHub atual já possui
+> escopo `workflow`; adicionado `.github/workflows/ci.yml` (Node 22/24, sintaxe dos 5 fontes,
+> npm ci/audit, diff-check). TEST-01 segue pendente por decisão. Criados `plan.md` e `resumo.md`
+> padronizados do portfólio.
+
 ## 0. Como usar este documento
 
 1. Execute na ordem **P0 → P1 → P2**, respeitando as ondas da §8.
